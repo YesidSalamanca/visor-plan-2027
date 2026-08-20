@@ -23,7 +23,7 @@ ANCLAS = [
  (71.27,79.07, "no necesita apelar a la urgencia manifiesta para contratar."),
 ]
 
-MAX_CARACTERES = 38   # por línea de subtítulo, dos líneas máximo
+MAX_CARACTERES = 26   # por línea de subtítulo, dos líneas máximo
 
 def tramos_de_habla(path, fin_total):
     """Convierte la salida de silencedetect en intervalos donde sí hay voz."""
@@ -50,7 +50,7 @@ def partir(texto):
             lineas.append(actual); actual = p
         else:
             actual = cand
-            if p.endswith((".", "?", "!", ":")) and len(actual) > MAX_CARACTERES * 0.5:
+            if p.endswith((".", "?", "!")) and len(actual) >= 6:
                 lineas.append(actual); actual = ""
     if actual: lineas.append(actual)
     return lineas

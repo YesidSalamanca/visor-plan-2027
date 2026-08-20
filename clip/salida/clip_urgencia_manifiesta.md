@@ -7,21 +7,28 @@ imagen en los empalmes), 848×480, 3 min 44 s en total.
 
 **Tramo usado**: `64.5 s → 143.6 s` del video unido (1 min 19 s).
 
+**Gancho**: `99.9 s → 108.45 s` (8,5 s), la frase «este señor no tiene ni idea de
+cómo funciona el Sistema Nacional de Gestión del Riesgo y en este momento está
+conduciendo el peor desastre que hemos tenido en lo que va del siglo». Va al
+principio en blanco y negro y vuelve a aparecer, ya en color, dentro del cuerpo.
+Total: 1 min 28 s.
+
 **Encuadre**: la fuente es una cuadrícula de Zoom de 2×2; el clip aísla el
 recuadro de Carrillo, que es el inferior izquierdo (`--precrop 398:226:17:245`).
 
 ## Comando
 
 ```bash
-clip/bin/render.sh \
-  --src completo.mp4 \
-  --inicio 64.5 --fin 143.6 \
-  --precrop "398:226:17:245" \
-  --layout blur \
-  --hook "EL ERROR DE ABELARDO\nCON LA URGENCIA\nMANIFIESTA" --hook-dur 4.5 \
-  --credito "Carlos Carrillo · exdirector de la UNGRD" \
-  --subs clip/salida/clip_urgencia_manifiesta.srt \
-  --salida clip_urgencia_manifiesta.mp4
+COMUN=(--src completo.mp4 --precrop "398:226:17:245" --layout blur
+       --fuente clip/fuentes/Roboto-700.ttf)
+
+clip/bin/render.sh "${COMUN[@]}" --inicio 99.90 --fin 108.45 --bn si  --grano si \
+  --subs clip/salida/gancho_urgencia_manifiesta.srt --salida gancho.mp4
+
+clip/bin/render.sh "${COMUN[@]}" --inicio 64.5  --fin 143.6  --bn no --grano no \
+  --subs clip/salida/clip_urgencia_manifiesta.srt --salida cuerpo.mp4
+
+clip/bin/unir.sh clip_urgencia_manifiesta.mp4 gancho.mp4 cuerpo.mp4
 ```
 
 Para rehacer `completo.mp4`:

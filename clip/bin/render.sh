@@ -20,9 +20,13 @@ OFFSET_X="0"         # corrimiento horizontal del encuadre en layout cover
 PRECROP=""           # recorte previo "ancho:alto:x:y" (p. ej. un recuadro de Zoom)
 REALCE="si"          # realce de nitidez, útil cuando hay que ampliar mucho la fuente
 GRANO="si"           # si | no
-SUBS_TAM="62"        # tamaño de los subtítulos en píxeles
+BN_MODO="si"         # si = blanco y negro (gancho) | no = color (cuerpo del clip)
+SUBS_TAM="68"        # tamaño de los subtítulos en píxeles
 SUBS_MARGEN=""       # distancia al borde inferior; por defecto según layout
-SUBS_MAYUS="si"      # subtítulos en mayúsculas
+SUBS_MAYUS="no"      # subtítulos en mayúsculas
+SUBS_RESALTADO="FCCB04"  # color de la palabra que se está diciendo; vacío lo desactiva
+SUBS_ANCHO="28"      # caracteres por línea de subtítulo
+SUBS_CONTORNO="4"    # grosor del contorno negro
 HOOK_Y="150"         # distancia del hook al borde superior
 SALIDA="clip/salida/clip.mp4"
 FUENTE_TTF=""
@@ -43,9 +47,13 @@ while [[ $# -gt 0 ]]; do
     --precrop)   PRECROP="$2"; shift 2 ;;
     --realce)    REALCE="$2"; shift 2 ;;
     --grano)     GRANO="$2"; shift 2 ;;
+    --bn)        BN_MODO="$2"; shift 2 ;;
     --subs-tam)  SUBS_TAM="$2"; shift 2 ;;
     --subs-margen) SUBS_MARGEN="$2"; shift 2 ;;
     --subs-mayus)  SUBS_MAYUS="$2"; shift 2 ;;
+    --subs-resaltado) SUBS_RESALTADO="$2"; shift 2 ;;
+    --subs-ancho)  SUBS_ANCHO="$2"; shift 2 ;;
+    --subs-contorno) SUBS_CONTORNO="$2"; shift 2 ;;
     --salida)    SALIDA="$2"; shift 2 ;;
     --fuente)    FUENTE_TTF="$2"; shift 2 ;;
     -h|--help)   sed -n '2,12p' "$0"; exit 0 ;;
@@ -111,7 +119,12 @@ if [[ "$REALCE" == "si" ]]; then
 fi
 
 # 1) Blanco y negro con contraste levantado (look editorial, no gris plano).
-BN="hue=s=0,eq=contrast=1.14:brightness=0.015:gamma=0.98,curves=all='0/0 0.25/0.20 0.5/0.52 0.75/0.82 1/1'"
+if [[ "$BN_MODO" == "si" ]]; then
+  BN="hue=s=0,eq=contrast=1.14:brightness=0.015:gamma=0.98,curves=all='0/0 0.25/0.20 0.5/0.52 0.75/0.82 1/1'"
+else
+  # En color solo levantamos un poco el contraste, sin tocar la saturación.
+  BN="eq=contrast=1.06:brightness=0.01:saturation=1.05"
+fi
 
 case "$LAYOUT" in
   blur)
@@ -184,9 +197,11 @@ if [[ -n "$SUBS" ]]; then
   if [[ "$SUBS" == *.ass ]]; then
     cp "$SUBS" "$ASS"
   else
-    MAYUS=(); [[ "$SUBS_MAYUS" == "si" ]] && MAYUS=(--mayusculas)
+    EXTRA=(); [[ "$SUBS_MAYUS" == "si" ]] && EXTRA+=(--mayusculas)
+    [[ -n "$SUBS_RESALTADO" ]] && EXTRA+=(--resaltado "$SUBS_RESALTADO")
     python3 "$(dirname "$0")/srt2ass.py" "$SUBS" "$ASS" \
-      --fuente "$FUENTE_NOMBRE" --tam "$SUBS_TAM" --margen "$SUBS_MARGEN" "${MAYUS[@]}" >/dev/null
+      --fuente "$FUENTE_NOMBRE" --tam "$SUBS_TAM" --margen "$SUBS_MARGEN" \
+      --ancho "$SUBS_ANCHO" --contorno "$SUBS_CONTORNO" "${EXTRA[@]}" >/dev/null
   fi
   SUBS_ESC=$(printf '%s' "$ASS" | sed -e 's/\\/\\\\/g' -e "s/'/\\\\'/g" -e 's/:/\\:/g')
   FILTROS="${FILTROS};[${ULTIMO}]subtitles='${SUBS_ESC}':fontsdir='${FUENTE_DIR}'[sb]"

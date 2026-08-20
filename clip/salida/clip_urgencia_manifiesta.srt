@@ -1,128 +1,184 @@
 1
-00:00:00,270 --> 00:00:03,165
-Y aquí vemos exactamente lo mismo.
+00:00:00,270 --> 00:00:02,056
+Y aquí vemos exactamente
 
 2
-00:00:03,165 --> 00:00:05,880
-Hay una acusación y yo la voy a citar.
+00:00:02,056 --> 00:00:03,162
+lo mismo.
 
 3
-00:00:06,745 --> 00:00:11,339
-Dicen: la UNGRD pagó 856 mil millones
+00:00:03,162 --> 00:00:04,636
+Hay una acusación y yo la
 
 4
-00:00:11,339 --> 00:00:15,235
-de pesos sin urgencia manifiesta.
+00:00:04,636 --> 00:00:05,880
+voy a citar.
 
 5
-00:00:15,235 --> 00:00:17,815
-Silencio, ¿cierto?
+00:00:06,745 --> 00:00:10,108
+Dicen: la UNGRD pagó 856
 
 6
+00:00:10,108 --> 00:00:12,554
+mil millones de pesos sin
+
+7
+00:00:12,554 --> 00:00:15,215
+urgencia manifiesta.
+
+8
+00:00:15,215 --> 00:00:17,815
+Silencio, ¿cierto?
+
+9
 00:00:18,189 --> 00:00:19,600
 Música de suspenso.
 
-7
-00:00:19,600 --> 00:00:22,036
-Y yo realmente quedé muy impactado
-
-8
-00:00:22,036 --> 00:00:23,962
-cuando escuché al presidente decir
-
-9
-00:00:23,962 --> 00:00:25,514
-eso, porque yo dije:
-
 10
-00:00:25,514 --> 00:00:27,691
-este señor no tiene ni idea
+00:00:19,600 --> 00:00:21,481
+Y yo realmente quedé muy
 
 11
-00:00:28,860 --> 00:00:31,118
-de cómo funciona la 1523, cómo
+00:00:21,481 --> 00:00:22,853
+impactado cuando escuché
 
 12
-00:00:31,118 --> 00:00:33,441
-funciona el Sistema Nacional de
+00:00:22,853 --> 00:00:24,224
+al presidente decir eso,
 
 13
-00:00:33,441 --> 00:00:35,390
-Gestión del Riesgo.
+00:00:24,224 --> 00:00:26,777
+porque yo dije: este señor
 
 14
-00:00:35,790 --> 00:00:37,237
-Este señor no tiene ni idea de cómo
+00:00:26,777 --> 00:00:27,691
+no tiene ni idea
 
 15
-00:00:37,237 --> 00:00:38,519
-funciona el Sistema Nacional de
+00:00:28,860 --> 00:00:30,416
+de cómo funciona la 1523,
 
 16
-00:00:38,519 --> 00:00:40,351
-Gestión del Riesgo, y en este momento
+00:00:30,416 --> 00:00:32,742
+cómo funciona el Sistema
 
 17
-00:00:40,351 --> 00:00:42,185
-está conduciendo el peor desastre que
+00:00:32,742 --> 00:00:34,174
+Nacional de Gestión del
 
 18
-00:00:42,185 --> 00:00:44,300
-hemos tenido en lo que va del siglo.
+00:00:34,174 --> 00:00:35,390
+Riesgo.
 
 19
-00:00:44,300 --> 00:00:46,569
-Yo realmente quedé impactado
+00:00:35,790 --> 00:00:36,715
+Este señor no tiene ni
 
 20
-00:00:46,962 --> 00:00:49,171
-porque la UNGRD no contrata por
+00:00:36,715 --> 00:00:37,725
+idea de cómo funciona el
 
 21
-00:00:49,171 --> 00:00:50,279
-urgencia manifiesta.
+00:00:37,725 --> 00:00:38,524
+Sistema Nacional de
 
 22
-00:00:51,068 --> 00:00:55,088
-La urgencia manifiesta es una figura
+00:00:38,524 --> 00:00:39,836
+Gestión del Riesgo, y en
 
 23
-00:00:55,088 --> 00:00:58,085
-de la Ley 80, pero el artículo 66 de
+00:00:39,836 --> 00:00:40,551
+este momento está
 
 24
-00:00:58,085 --> 00:00:59,000
-la Ley 1523
+00:00:40,551 --> 00:00:41,654
+conduciendo el peor
 
 25
-00:00:59,000 --> 00:01:01,212
-le da a la UNGRD unas facultades
+00:00:41,654 --> 00:00:42,706
+desastre que hemos tenido
 
 26
-00:01:01,212 --> 00:01:03,493
-excepcionales de contratación, un
+00:00:42,706 --> 00:00:44,300
+en lo que va del siglo.
 
 27
-00:01:03,493 --> 00:01:05,843
-régimen especialísimo que funciona
+00:00:44,300 --> 00:00:45,415
+Yo realmente quedé
 
 28
-00:01:05,843 --> 00:01:06,880
-entre privados.
+00:00:45,415 --> 00:00:46,569
+impactado
 
 29
-00:01:07,270 --> 00:01:09,131
-La UNGRD contrata entre privados.
+00:00:46,962 --> 00:00:48,470
+porque la UNGRD no
 
 30
-00:01:09,131 --> 00:01:10,880
-Entonces, ya solamente con eso,
+00:00:48,470 --> 00:00:49,657
+contrata por urgencia
 
 31
-00:01:11,270 --> 00:01:15,573
-no necesita apelar a la urgencia
+00:00:49,657 --> 00:00:50,279
+manifiesta.
 
 32
-00:01:15,573 --> 00:01:19,070
-manifiesta para contratar.
+00:00:51,068 --> 00:00:53,549
+La urgencia manifiesta es
+
+33
+00:00:53,549 --> 00:00:56,220
+una figura de la Ley 80,
+
+34
+00:00:56,220 --> 00:00:58,326
+pero el artículo 66 de la
+
+35
+00:00:58,326 --> 00:00:59,000
+Ley 1523
+
+36
+00:00:59,000 --> 00:01:00,464
+le da a la UNGRD unas
+
+37
+00:01:00,464 --> 00:01:02,138
+facultades excepcionales
+
+38
+00:01:02,138 --> 00:01:03,463
+de contratación, un
+
+39
+00:01:03,463 --> 00:01:05,206
+régimen especialísimo que
+
+40
+00:01:05,206 --> 00:01:06,880
+funciona entre privados.
+
+41
+00:01:07,270 --> 00:01:08,588
+La UNGRD contrata entre
+
+42
+00:01:08,588 --> 00:01:09,849
+privados. Entonces, ya
+
+43
+00:01:09,849 --> 00:01:10,880
+solamente con eso,
+
+44
+00:01:11,270 --> 00:01:14,417
+no necesita apelar a la
+
+45
+00:01:14,417 --> 00:01:17,702
+urgencia manifiesta para
+
+46
+00:01:17,702 --> 00:01:19,070
+contratar.
 
