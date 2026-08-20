@@ -1,130 +1,104 @@
-# Clips verticales en blanco y negro con hook
+# Clips verticales en blanco y negro
 
-Herramientas para sacar un clip de una transmisión larga y dejarlo listo para
-TikTok / Reels / Shorts: vertical 9:16, imagen en blanco y negro con contraste
-levantado, un **hook** de texto en los primeros segundos y subtítulos quemados.
-
-Todo corre con `ffmpeg` y `yt-dlp`; no hay que abrir un editor.
+Herramientas para sacar clips de formato TikTok (9:16, blanco y negro, hook
+inicial y subtítulos quemados) a partir de una grabación larga.
 
 ## Requisitos
 
-```bash
-pip install -U yt-dlp
-sudo apt-get install -y ffmpeg          # macOS: brew install ffmpeg
-pip install -U faster-whisper           # opcional, solo si hay que transcribir
-```
+- `ffmpeg` con `libx264`, `libfreetype` (drawtext) y `libass` (subtitles).
+- Para transcribir sin conexión: `pip install sherpa-onnx numpy`, más el modelo
+  Whisper en ONNX y el VAD Silero (ver *Transcripción*).
 
-## Flujo completo
-
-### 1. Bajar el tramo del video
-
-Bajar la transmisión entera de varias horas es lento y casi nunca hace falta.
-Si ya sabes más o menos dónde está el momento, baja solo esa ventana con un
-margen generoso:
-
-```bash
-clip/bin/descargar.sh "https://www.youtube.com/live/abq2sDpniuM" \
-  --seccion "*01:05:00-01:20:00"
-```
-
-Sin `--seccion` baja la transmisión completa. En ambos casos intenta traerse
-también los subtítulos automáticos en español y los convierte a `.srt`.
-
-Los archivos quedan en `clip/fuente/`.
-
-### 2. Ubicar el momento exacto
-
-```bash
-clip/bin/buscar.py clip/fuente/abq2sDpniuM.es.srt "urgencia manifiesta" "abelardo"
-```
-
-Muestra cada coincidencia con su timestamp y el contexto alrededor. De ahí
-salen el `--inicio` y el `--fin` del clip.
-
-Si el video no trajo subtítulos automáticos:
-
-```bash
-clip/bin/transcribir.sh clip/fuente/abq2sDpniuM.mp4 medium
-```
-
-### 3. Recortar los subtítulos a la ventana del clip
-
-Los tiempos del `.srt` original están en la escala de la transmisión completa;
-hay que llevarlos a cero:
-
-```bash
-clip/bin/recortar-subs.py clip/fuente/abq2sDpniuM.es.srt clip/salida/clip.srt \
-  --inicio 01:10:22 --fin 01:10:58 --desfase 01:05:00
-```
-
-`--inicio` y `--fin` van siempre en la escala de la transmisión completa, que
-es la del `.srt`. `--desfase` es el comienzo de la `--seccion` que bajaste; con
-eso el script además te imprime los tiempos que corresponden dentro del archivo
-recortado, que son los que recibe `render.sh`. Si bajaste el video completo,
-omite `--desfase`.
-
-Vale la pena abrir el `.srt` resultante y limpiarlo a mano: los subtítulos
-automáticos de YouTube se equivocan con nombres propios y con términos como
-*urgencia manifiesta*, y en un clip corto cada error se nota.
-
-### 4. Renderizar
+## Render
 
 ```bash
 clip/bin/render.sh \
-  --src clip/fuente/abq2sDpniuM.mp4 \
-  --inicio 01:10:22 --fin 01:10:58 \
-  --hook "EL ERROR DE ABELARDO CON LA URGENCIA MANIFIESTA" \
-  --hook-dur 4 \
-  --credito "Carlos Carrillo · en vivo" \
-  --subs clip/salida/clip.srt \
-  --salida clip/salida/urgencia-manifiesta.mp4
+  --src grabacion.mp4 \
+  --inicio 64.5 --fin 143.6 \
+  --hook "EL ERROR DE ABELARDO\nCON LA URGENCIA\nMANIFIESTA" \
+  --subs clip.srt \
+  --salida clip.mp4
 ```
 
-> Los tiempos de `render.sh` son los del archivo fuente. Si bajaste con
-> `--seccion`, son los que imprime el paso 3, no los de la transmisión completa.
+| Opción | Para qué sirve |
+|---|---|
+| `--src` | Archivo fuente. |
+| `--inicio` / `--fin` / `--duracion` | Recorte temporal (`00:01:04.5` o `64.5`). |
+| `--hook` / `--hook-dur` | Titular de apertura y cuántos segundos dura (4–5 s va bien). Usa `\n` para separar líneas; el tamaño de letra se ajusta solo. |
+| `--credito` | Línea discreta al pie: nombre, programa, fecha. |
+| `--subs` | `.srt` o `.ass` que se quema en el video. |
+| `--layout` | `blur` (cuadro completo sobre fondo desenfocado, el que menos recorta) o `cover` (encuadre cerrado a pantalla completa). |
+| `--offset-x` | Corre el encuadre en `cover` si la persona no está centrada. |
+| `--precrop` | `ancho:alto:x:y` para aislar un recuadro de la fuente — p. ej. una sola cámara de una cuadrícula de Zoom. |
+| `--realce` | `si` (por defecto) limpia el ruido de compresión y afila tras ampliar. Ponlo en `no` si la fuente ya está en alta resolución. |
+| `--grano` | `si` (por defecto) añade grano fino; disimula los artefactos del blanco y negro. |
+| `--hook-y` | Sube o baja el titular si tapa algo del encuadre. |
+| `--subs-tam` / `--subs-margen` | Tamaño de los subtítulos y separación desde el borde inferior. |
+| `--subs-mayus` | `si` (por defecto) pone los subtítulos en mayúsculas, como el formato de referencia. `no` respeta el texto original. |
+| `--fuente` | Ruta a un `.ttf` en negrita si quieres otra tipografía. |
 
-## Opciones de `render.sh`
+## Aislar un recuadro de una cuadrícula de Zoom
 
-| Opción | Por defecto | Para qué sirve |
-|---|---|---|
-| `--src` | — | Video fuente (obligatorio) |
-| `--inicio` / `--fin` | — | Ventana del clip; `--duracion` reemplaza a `--fin` |
-| `--hook` | — | Titular inicial. Se parte solo cada 20 caracteres; `\n` fuerza el salto |
-| `--hook-dur` | `4` | Segundos que dura el hook en pantalla |
-| `--hook-y` | `150` | Distancia del hook al borde superior |
-| `--credito` | — | Línea pequeña al pie (programa, fecha, @usuario) |
-| `--subs` | — | `.srt` o `.ass` a quemar |
-| `--subs-tam` | `62` | Tamaño de los subtítulos en píxeles |
-| `--subs-margen` | `420` / `260` | Distancia al borde inferior según el layout |
-| `--subs-mayus` | `si` | Subtítulos en mayúsculas |
-| `--layout` | `blur` | `blur`: cuadro completo sobre fondo desenfocado. `cover`: encuadre cerrado a pantalla completa |
-| `--offset-x` | `0` | Mueve el encuadre en `cover` (útil si el orador no está centrado) |
-| `--grano` | `si` | Grano ligero, para que el blanco y negro no quede plano |
-| `--fuente` | DejaVu Sans Bold | Ruta a un `.ttf` en negrita |
-| `--salida` | `clip/salida/clip.mp4` | Archivo final |
+Saca un fotograma, mide dónde están las separaciones negras y pásalas a
+`--precrop`:
 
-## Qué produce
+```bash
+ffmpeg -ss 20 -i grabacion.mp4 -frames:v 1 muestra.png
+python3 - <<'PY'
+from PIL import Image; import numpy as np
+im = np.array(Image.open('muestra.png').convert('L')).astype(int)
+col, row = im.mean(axis=0), im.mean(axis=1)
+print([i for i,v in enumerate(col) if v < 45])   # separaciones verticales
+print([i for i,v in enumerate(row) if v < 45])   # separaciones horizontales
+PY
+```
 
-H.264 alto perfil, 1080×1920, 30 fps, CRF 19, `+faststart`, audio AAC 192k
-normalizado a −14 LUFS (el estándar de loudness de estas plataformas).
+## Transcripción sin conexión
 
-## Cómo se ve
+Cuando no hay salida a YouTube ni a los CDN de modelos, `sherpa-onnx` sirve
+porque se instala desde PyPI y sus modelos están publicados como *release
+assets* de GitHub:
 
-El armado en `--layout blur` de arriba abajo: banda del hook, el cuadro del
-video a todo el ancho en el tercio medio, los subtítulos justo debajo y el
-crédito al pie. El fondo que queda a los lados es el mismo cuadro ampliado,
-desenfocado y oscurecido, así que el clip nunca muestra barras negras muertas.
+```bash
+pip install sherpa-onnx numpy
+mkdir -p /opt/asr && cd /opt/asr
+BASE=https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models
+curl -L -o w.tar.bz2 $BASE/sherpa-onnx-whisper-small.tar.bz2 && tar xf w.tar.bz2
+curl -L -o silero_vad.onnx $BASE/silero_vad.onnx
+```
 
-Con `--layout cover` el video llena toda la pantalla y el hook y los
-subtítulos van encima; sirve para primeros planos, pero recorta mucho: de un
-16:9 solo sobrevive la franja central.
+`bin/transcribir.py` corta el audio con el VAD y pasa cada tramo por Whisper,
+devolviendo un JSON con tiempos y texto. Requiere audio mono a 16 kHz:
 
-## Escribir el hook
+```bash
+ffmpeg -i grabacion.mp4 -vn -ac 1 -ar 16000 -c:a pcm_s16le audio16k.wav
+python3 clip/bin/transcribir.py audio16k.wav transcripcion.json
+```
 
-Los primeros dos segundos deciden si alguien se queda. Sirve como referencia:
+## Subtítulos sincronizados
 
-- El hook nombra el conflicto, no el tema. «EL ERROR DE ABELARDO CON LA
-  URGENCIA MANIFIESTA» funciona; «CARLOS CARRILLO HABLA DE CONTRATACIÓN», no.
-- Tres líneas cortas leen mejor que dos largas.
-- Que el hook no repita literalmente lo primero que se dice en el audio.
-- Mayúsculas, sin punto final.
+`bin/hacer_srt.py` reparte un texto ya corregido a mano sobre los tramos donde
+sí hay voz, tomándolos de `silencedetect`. Así los subtítulos no se desfasan en
+las pausas largas:
+
+```bash
+ffmpeg -i audio16k.wav -af "silencedetect=noise=-32dB:d=0.16" -f null - 2>&1 \
+  | grep -E "silence_(start|end)" > silencios.txt
+python3 clip/bin/hacer_srt.py silencios.txt clip.srt
+```
+
+Las anclas (tiempo de inicio, tiempo de fin, texto) se editan dentro del script.
+Conviene verificar los bordes de cada ancla transcribiendo ventanas sueltas con
+`bin/ventana.py`, porque Whisper corrige nombres propios y siglas de forma
+inconsistente (`UNGRD` sale como *UNRD*, *UNHRD* o *UNGD*; `1523` como *15 23*).
+
+## Otros scripts
+
+| Script | Para qué |
+|---|---|
+| `bin/descargar.sh` | Baja el video (y sus subtítulos automáticos) con `yt-dlp`. Acepta `--seccion "*01:10:00-01:14:00"` para traer solo un tramo. Necesita salida a YouTube, así que hay que correrlo en una máquina local. |
+| `bin/transcribir.sh` | Genera un `.srt` con Whisper cuando no hay subtítulos automáticos. También pide descargar el modelo. |
+| `bin/buscar.py` | Busca frases dentro de un `.srt` y dice en qué minuto están. Útil para ubicar el tramo antes de cortar. |
+| `bin/ventana.py` | Transcribe ventanas sueltas (`ventana.py audio.wav 46-53 52-59`) para verificar dónde empieza y termina una frase. |
+| `bin/recortar-subs.py` | Recorta un `.srt` largo al tramo del clip y lo vuelve a poner en cero. |
+| `bin/srt2ass.py` | Convierte un `.srt` a `.ass` con el estilo vertical, si quieres retocar el subtítulo a mano. |

@@ -17,6 +17,8 @@ CREDITO=""
 SUBS=""
 LAYOUT="blur"        # blur | cover
 OFFSET_X="0"         # corrimiento horizontal del encuadre en layout cover
+PRECROP=""           # recorte previo "ancho:alto:x:y" (p. ej. un recuadro de Zoom)
+REALCE="si"          # realce de nitidez, útil cuando hay que ampliar mucho la fuente
 GRANO="si"           # si | no
 SUBS_TAM="62"        # tamaño de los subtítulos en píxeles
 SUBS_MARGEN=""       # distancia al borde inferior; por defecto según layout
@@ -38,6 +40,8 @@ while [[ $# -gt 0 ]]; do
     --subs)      SUBS="$2"; shift 2 ;;
     --layout)    LAYOUT="$2"; shift 2 ;;
     --offset-x)  OFFSET_X="$2"; shift 2 ;;
+    --precrop)   PRECROP="$2"; shift 2 ;;
+    --realce)    REALCE="$2"; shift 2 ;;
     --grano)     GRANO="$2"; shift 2 ;;
     --subs-tam)  SUBS_TAM="$2"; shift 2 ;;
     --subs-margen) SUBS_MARGEN="$2"; shift 2 ;;
@@ -96,6 +100,16 @@ RECORTE=(-ss "$INICIO")
 if [[ -n "$FIN" ]]; then RECORTE+=(-to "$FIN"); else RECORTE+=(-t "$DURACION"); fi
 
 # --- Cadena de filtros --------------------------------------------------------
+# Preprocesado: aísla un recuadro de la fuente (Zoom, split screen) y, si toca
+# ampliarlo mucho, limpia el ruido de compresión antes de escalar.
+PRE=""
+REALCE_POST=""
+[[ -n "$PRECROP" ]] && PRE="crop=${PRECROP},"
+if [[ "$REALCE" == "si" ]]; then
+  PRE="${PRE}hqdn3d=2:1.5:3:3,"
+  REALCE_POST=",unsharp=5:5:0.9:5:5:0.0"
+fi
+
 # 1) Blanco y negro con contraste levantado (look editorial, no gris plano).
 BN="hue=s=0,eq=contrast=1.14:brightness=0.015:gamma=0.98,curves=all='0/0 0.25/0.20 0.5/0.52 0.75/0.82 1/1'"
 
@@ -104,15 +118,15 @@ case "$LAYOUT" in
     # Fondo: el mismo cuadro ampliado, desenfocado y oscurecido.
     # Frente: el cuadro completo a todo el ancho, centrado en el tercio medio.
     LAYOUT_FILTER="\
-[0:v]fps=30,setpts=PTS-STARTPTS,split=2[bg][fg];
+[0:v]fps=30,setpts=PTS-STARTPTS,${PRE}split=2[bg][fg];
 [bg]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,gblur=sigma=28,eq=brightness=-0.16:contrast=0.95[bgb];
-[fg]scale=1080:-2[fgs];
+[fg]scale=1080:-2:flags=lanczos${REALCE_POST}[fgs];
 [bgb][fgs]overlay=x=0:y=(H-h)/2+40:shortest=1[comp]"
     ;;
   cover)
     # Encuadre cerrado a pantalla completa; --offset-x mueve el recorte.
     LAYOUT_FILTER="\
-[0:v]fps=30,setpts=PTS-STARTPTS,scale=1080:1920:force_original_aspect_ratio=increase,\
+[0:v]fps=30,setpts=PTS-STARTPTS,${PRE}scale=1080:1920:force_original_aspect_ratio=increase:flags=lanczos,\
 crop=1080:1920:(iw-1080)/2+${OFFSET_X}:(ih-1920)/2[comp]"
     ;;
   *) echo "--layout debe ser blur o cover" >&2; exit 1 ;;
