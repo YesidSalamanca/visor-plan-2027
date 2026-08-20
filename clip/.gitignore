@@ -1,0 +1,8 @@
+# Los medios pesados no van al repositorio.
+*.mp4
+*.mkv
+*.webm
+*.m4a
+*.mp3
+*.vtt
+!.gitkeep
