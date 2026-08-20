@@ -54,8 +54,14 @@ hay que llevarlos a cero:
 
 ```bash
 clip/bin/recortar-subs.py clip/fuente/abq2sDpniuM.es.srt clip/salida/clip.srt \
-  --inicio 01:10:22 --fin 01:10:58
+  --inicio 01:10:22 --fin 01:10:58 --desfase 01:05:00
 ```
+
+`--inicio` y `--fin` van siempre en la escala de la transmisión completa, que
+es la del `.srt`. `--desfase` es el comienzo de la `--seccion` que bajaste; con
+eso el script además te imprime los tiempos que corresponden dentro del archivo
+recortado, que son los que recibe `render.sh`. Si bajaste el video completo,
+omite `--desfase`.
 
 Vale la pena abrir el `.srt` resultante y limpiarlo a mano: los subtítulos
 automáticos de YouTube se equivocan con nombres propios y con términos como
@@ -74,9 +80,8 @@ clip/bin/render.sh \
   --salida clip/salida/urgencia-manifiesta.mp4
 ```
 
-> Ojo: si bajaste el video con `--seccion`, el archivo empieza en el segundo 0
-> de esa ventana, así que `--inicio` y `--fin` van relativos a ese recorte, no
-> a la transmisión completa.
+> Los tiempos de `render.sh` son los del archivo fuente. Si bajaste con
+> `--seccion`, son los que imprime el paso 3, no los de la transmisión completa.
 
 ## Opciones de `render.sh`
 

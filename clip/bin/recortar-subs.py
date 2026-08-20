@@ -3,8 +3,12 @@
 
     clip/bin/recortar-subs.py entrada.srt salida.srt --inicio 01:10:24 --fin 01:10:58
 
-Los tiempos aceptan HH:MM:SS, MM:SS o segundos sueltos, y deben ser los mismos
-que se le pasan a render.sh.
+Los tiempos aceptan HH:MM:SS, MM:SS o segundos sueltos.
+
+--inicio y --fin se expresan siempre en la escala del .srt de entrada, que es
+la de la transmisión completa. Si el video que vas a renderizar se bajó con
+--seccion, pásale a --desfase el comienzo de esa sección: la salida se ajusta
+para que calce con ese archivo, y ahí render.sh recibe los tiempos relativos.
 """
 import argparse
 import re
@@ -36,11 +40,16 @@ def main():
     p.add_argument("salida")
     p.add_argument("--inicio", required=True)
     p.add_argument("--fin", required=True)
+    p.add_argument("--desfase", default="0",
+                   help="punto de la transmisión en que empieza el video fuente")
     a = p.parse_args()
 
     ini, fin = a_segundos(a.inicio), a_segundos(a.fin)
     if fin <= ini:
         raise SystemExit("--fin debe ser posterior a --inicio")
+    desfase = a_segundos(a.desfase)
+    if desfase > ini:
+        raise SystemExit("--desfase no puede ser posterior a --inicio")
 
     texto = open(a.entrada, encoding="utf-8-sig").read().replace("\r\n", "\n")
     salida, n = [], 0
@@ -69,6 +78,9 @@ def main():
         raise SystemExit("Ningún subtítulo cae dentro de esa ventana.")
     open(a.salida, "w", encoding="utf-8").write("\n".join(salida) + "\n")
     print(f"{a.salida} ({n} subtítulos, ventana de {fin - ini:.1f}s)")
+    if desfase:
+        print(f"Sobre el video fuente, ese tramo va de {fmt(ini - desfase)[:8]} "
+              f"a {fmt(fin - desfase)[:8]}; esos son los tiempos para render.sh.")
 
 
 if __name__ == "__main__":
